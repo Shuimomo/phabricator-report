@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry exported="true" kind="con" path="net.sf.jasperreports.JR_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="com.jaspersoft.server.JRS_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/com.mysql.jdbc_5.1.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/commons-beanutils-1.8.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/commons-collections-3.2.1-1.0.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/commons-digester-2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/commons-logging-1.2.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/itext-2.1.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/joda-time-2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="E:/Eclipse workspace/testConnection/addition library/spring-2.5.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

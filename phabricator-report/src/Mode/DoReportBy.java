@@ -32,7 +32,7 @@ public class DoReportBy {
 	private String chemin;
 
 	/**
-	 * Constructor
+	 * Constructor(prepare jdbc connection&compile jrxml)
 	 * @param String[] config
 	 */
 	@SuppressWarnings("unchecked")
@@ -81,13 +81,14 @@ public class DoReportBy {
 		List<String> allID = report.getAllID();
 		List<String> idset = new ArrayList<String>();
 		/*
-		 * for each report id passed, create a pdf 
+		 * get all the ids that can be found in DB, put into a list
 		 */
 		for(int j=0;j<idlist.size();j++){
 			String id = idlist.get(j);
 			if(allID.contains(id)){
 				idset.add(id);
 			}
+			//if cannot find this id, send a message and go to the next
 			else{
 				System.out.println("Cannot find revision" + id);
 				continue;
@@ -100,8 +101,8 @@ public class DoReportBy {
 	}
 
 	/**
-	 * create report(s) of all the revisions of version given
-	 * @param String version
+	 * create ths reports of all the revisions in version(s) given
+	 * @param List<String> version
 	 * @throws JRException
 	 */
 	public void byVersion(List<String> versions) throws JRException{
@@ -111,8 +112,10 @@ public class DoReportBy {
 			System.out.println("Version "+version+" :");
 			String checkversion = version +" ";
 			List<String> idlist = new ArrayList<String>();
+			//to get the ids of all the revisions in this version 
 			idlist = report.getIDsOfVersion(checkversion);
 
+			//if cannot find any revision, send a message
 			if(idlist.size()==0){
 				System.out.println("Cannot find any revision of version " + version);
 				continue;
@@ -130,6 +133,10 @@ public class DoReportBy {
 		con.close();
 	}
 
+	/**
+	 * every report id in the list refer to a revision(always can be found), for every revision, fill and export its report
+	 * @param List<String> idset, Connection connection
+	 */
 	@SuppressWarnings("unchecked")
 	private void doReport(List<String> idset, Connection connection) throws JRException {
 		for(int i=0;i<idset.size();i++){

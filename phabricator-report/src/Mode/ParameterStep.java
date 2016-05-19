@@ -34,7 +34,7 @@ public class ParameterStep {
 		 *  if cannot recognize the mode (enter other things), should give a message and ask again
 		 */
 		if(!mode.equals("1")&&!mode.equals("2")){
-			System.out.println("Cannot understand '" + mode +"'");
+			System.out.println("Invalid option '" + mode +"'");
 			this.step1(config);
 		}
 

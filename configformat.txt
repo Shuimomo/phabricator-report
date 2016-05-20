@@ -1,14 +1,14 @@
 /*-----------------location of jrxml--------------------*/
-XXXXXXX
+/path/phabricator-rapport.jrxml
 /*------------------url of database---------------------*/
-XXX
+jdbc:mysql://localhost:3306
 /*----------------username of database------------------*/
-XXX
+user
 /*----------------password of datebase------------------*/
-XXX
+password
 /*-------------------customer's name--------------------*/
-XXXX
+customer
 /*--------------------project name----------------------*/
-XXXXX
+project
 /*-----where you want to place your reports-------------*/
-XXXXX
+/putreportin/

@@ -41,15 +41,12 @@ public class DoReport {
 								paras.add(args[i]);
 							}
 							beginAt.step3(config, mode, paras);
-							System.exit(1);
 						}
 						//if don't have more arguments = only have config and mode, go to step2
 						beginAt.step2(config, mode);
-						System.exit(1);
 					}
 					//if don't have more than 2 arguments = only have config, go to step1
 					beginAt.step1(config);
-					System.exit(1);
 				}
 				System.out.println("Need configuration file");
 			}

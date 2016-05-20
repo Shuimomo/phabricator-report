@@ -85,5 +85,6 @@ public class ParameterStep {
 				doInMode.byID(paras);
 			}
 		}
+		System.exit(1);
 	}
 }

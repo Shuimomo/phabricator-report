@@ -1,0 +1,14 @@
+/*-----------------location of jrxml--------------------*/
+XXXXXXX
+/*------------------url of database---------------------*/
+XXX
+/*----------------username of database------------------*/
+XXX
+/*----------------password of datebase------------------*/
+XXX
+/*-------------------customer's name--------------------*/
+XXXX
+/*--------------------project name----------------------*/
+XXXXX
+/*-----where you want to place your reports-------------*/
+XXXXX

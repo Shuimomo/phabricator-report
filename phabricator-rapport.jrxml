@@ -145,9 +145,6 @@ order by valeur_date]]>
 	<queryString>
 		<![CDATA[select
 CONVERT (phabricator_differential.differential_revision.title using utf8) as titre,
- SUBSTR(phabricator_differential.differential_revision.title,7,7) as version,
-SUBSTR(phabricator_differential.differential_revision.title,17,8) as revue,
-SUBSTR(phabricator_differential.differential_revision.title, 34) as titre2,
 phabricator_differential.differential_revision.id as revision,
 CONVERT (phabricator_differential.differential_revision.summary using utf8) as résumé,
 CONVERT (phabricator_differential.differential_revision.`testPlan` using utf8 ) as test ,

@@ -400,7 +400,7 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 								<textElement textAlignment="Center">
 									<font size="12" isBold="true"/>
 								</textElement>
-								<text><![CDATA[Approuvé par :]]></text>
+								<text><![CDATA[Approuvé par]]></text>
 							</staticText>
 						</jr:columnHeader>
 						<jr:column width="284" uuid="4e5d6ae9-512c-4cdd-8782-ade234b1b63e">

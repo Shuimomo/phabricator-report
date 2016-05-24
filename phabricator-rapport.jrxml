@@ -155,9 +155,6 @@ from   phabricator_differential.differential_revision, phabricator_user.user
 and phabricator_user.user.phid =   phabricator_differential.differential_revision.`authorPHID`]]>
 	</queryString>
 	<field name="titre" class="java.lang.String"/>
-	<field name="version" class="java.lang.String"/>
-	<field name="revue" class="java.lang.String"/>
-	<field name="titre2" class="java.lang.String"/>
 	<field name="revision" class="java.lang.Long"/>
 	<field name="résumé" class="java.lang.String"/>
 	<field name="test" class="java.lang.String"/>

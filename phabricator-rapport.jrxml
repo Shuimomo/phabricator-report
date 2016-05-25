@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.2.1.final using JasperReports Library version 6.2.1  -->
-<!-- 2016-05-18T17:15:35 -->
+<!-- 2016-05-26T01:41:14 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="phabricator-rapport" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="16150f60-1ffa-4da9-8195-5deea5e0f8f5">
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF" pattern="">
 		<box>
@@ -20,7 +20,7 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table 1_CH" mode="Opaque" backcolor="#FF5757">
+	<style name="Table 1_CH" mode="Opaque" backcolor="#FA4B4B">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -47,7 +47,7 @@
 			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table 2_CH" mode="Opaque" backcolor="#FF5757">
+	<style name="Table 2_CH" mode="Opaque" backcolor="#FA4B4B">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
@@ -80,17 +80,44 @@
 			<bottomPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="Table 4_CH" mode="Opaque" backcolor="#BFE1FF">
+	<style name="Table 4_CH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<topPen lineWidth="0.5" lineColor="#000000"/>
 			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 5_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 5_CH" mode="Opaque" backcolor="#FA4B4B">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table 5_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
 	<subDataset name="fichiers" uuid="0ffadac7-90bb-4692-8a9b-b1cbbc6bfc00">
 		<parameter name="idreport" class="java.lang.String"/>
 		<queryString>
 			<![CDATA[SELECT 
-phabricator_differential.differential_changeset.filename,
+distinct phabricator_differential.differential_changeset.filename,
 (case when (fileType = 3) 
 THEN "(fichier binaire)" 
 ELSE ""
@@ -109,19 +136,29 @@ phabricator_differential.differential_diff.id = phabricator_differential.differe
 		<parameter name="idreport" class="java.lang.Long"/>
 		<queryString>
 			<![CDATA[select 
+CONVERT (C1.content using utf8) as commentaire,
  phabricator_user.user.`userName` as nomAuteurCommentaire,
-CONVERT (phabricator_differential.differential_transaction_comment.content using utf8) as commentaire,
-FROM_UNIXTIME(phabricator_differential.differential_transaction_comment.`dateCreated`) as valeur_date
- from phabricator_user.user, 
- phabricator_differential.differential_transaction_comment,
-phabricator_differential.differential_revision
- where  phabricator_differential.differential_transaction_comment.`authorPHID` =  phabricator_user.user.phid
- and phabricator_differential.differential_transaction_comment.`revisionPHID` =  phabricator_differential.differential_revision.phid 
-and  phabricator_differential.differential_revision.id =  $P{idreport}
+FROM_UNIXTIME(C1.`dateCreated`) as valeur_date
+from  phabricator_differential.differential_transaction_comment C1,
+ phabricator_user.user, 
+phabricator_differential.differential_revision,
+phabricator_differential.differential_transaction
+ where  C1.`authorPHID` =  phabricator_user.user.phid 
+and  phabricator_differential.differential_transaction.phid = C1.`transactionPHID` 
+and phabricator_differential.differential_transaction.`objectPHID` =  phabricator_differential.differential_revision.phid 
+and C1.commentVersion =  (Select max(C2.commentVersion) 
+				from phabricator_differential.differential_transaction_comment C2
+				where C1.`transactionPHID`  = C2.`transactionPHID` )
+and not exists ( Select * from phabricator_differential.differential_transaction_comment C2
+				where C1.`transactionPHID`  = C2.`transactionPHID` and C2.isdeleted != 0)
+and  phabricator_differential.differential_revision.id  =  $P{idreport} 
+and C1.changesetID is NULL
+and C1.content != "
+"
 order by  valeur_date]]>
 		</queryString>
-		<field name="nomAuteurCommentaire" class="java.lang.String"/>
 		<field name="commentaire" class="java.lang.String"/>
+		<field name="nomAuteurCommentaire" class="java.lang.String"/>
 		<field name="valeur_date" class="java.sql.Timestamp"/>
 	</subDataset>
 	<subDataset name="validé par" uuid="486fe6f6-d1e2-4eed-9afd-b680a01fcdcc">
@@ -129,7 +166,9 @@ order by  valeur_date]]>
 		<queryString>
 			<![CDATA[select  phabricator_user.user.`userName` as nom, 
 FROM_UNIXTIME(phabricator_differential.differential_transaction.`dateModified`) as valeur_date
-from  phabricator_differential.differential_revision, phabricator_differential.differential_transaction, phabricator_user.user
+from  phabricator_differential.differential_revision,
+ phabricator_differential.differential_transaction,
+  phabricator_user.user
 where  phabricator_differential.differential_transaction.`objectPHID`   =  phabricator_differential.differential_revision.phid 
 and  phabricator_differential.differential_transaction.`authorPHID` =  phabricator_user.user.phid
 and phabricator_differential.differential_revision.id =  $P{idreport}
@@ -138,6 +177,38 @@ order by valeur_date]]>
 		</queryString>
 		<field name="nom" class="java.lang.String"/>
 		<field name="valeur_date" class="java.sql.Timestamp"/>
+	</subDataset>
+	<subDataset name="Commentaires Lignes de code" uuid="cb250c00-abdf-4e22-b21b-ab53c459a508">
+		<parameter name="idreport" class="java.lang.Long"/>
+		<queryString>
+			<![CDATA[select 
+C1.lineNUmber,
+CONVERT (C1.content using utf8) as commentaireLigne,
+phabricator_user.user.`userName` as nomAuteurCommentaire,
+FROM_UNIXTIME(C1.`dateCreated`) as valeur_date,
+phabricator_differential.differential_changeset.filename
+from  phabricator_differential.differential_transaction_comment C1,
+ phabricator_user.user, 
+phabricator_differential.differential_revision,
+phabricator_differential.differential_transaction,
+phabricator_differential.differential_changeset
+ where  C1.`authorPHID` =  phabricator_user.user.phid 
+and  phabricator_differential.differential_transaction.phid = C1.`transactionPHID` 
+and phabricator_differential.differential_transaction.`objectPHID` =  phabricator_differential.differential_revision.phid 
+and C1.commentVersion =  (Select max(C2.commentVersion) 
+				from phabricator_differential.differential_transaction_comment C2
+				where C1.`transactionPHID`  = C2.`transactionPHID` )
+and not exists ( Select * from phabricator_differential.differential_transaction_comment C2
+				where C1.`transactionPHID`  = C2.`transactionPHID` and C2.isdeleted != 0)
+and phabricator_differential.differential_changeset.id =  C1.changesetID
+and phabricator_differential.differential_revision.id =  $P{idreport} 
+order by valeur_date]]>
+		</queryString>
+		<field name="lineNUmber" class="java.lang.Long"/>
+		<field name="commentaireLigne" class="java.lang.String"/>
+		<field name="nomAuteurCommentaire" class="java.lang.String"/>
+		<field name="valeur_date" class="java.sql.Timestamp"/>
+		<field name="filename" class="java.lang.String"/>
 	</subDataset>
 	<parameter name="idreport" class="java.lang.Long"/>
 	<parameter name="client" class="java.lang.String"/>
@@ -166,7 +237,7 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 	<title>
 		<band height="165" splitType="Stretch">
 			<frame>
-				<reportElement positionType="Float" x="-20" y="-20" width="595" height="180" backcolor="#FFFFFF" uuid="6f32b6cf-00f0-467d-974f-1e470bd4da36"/>
+				<reportElement positionType="Float" x="-20" y="-19" width="595" height="180" backcolor="#FFFFFF" uuid="6f32b6cf-00f0-467d-974f-1e470bd4da36"/>
 				<box>
 					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
 					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
@@ -254,6 +325,10 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 					</textField>
 				</frame>
 			</frame>
+			<textField>
+				<reportElement x="52" y="20" width="100" height="30" uuid="7548fe47-9ba7-458e-b6ff-42de60f65612"/>
+				<textFieldExpression><![CDATA[$P{projet}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
@@ -263,9 +338,9 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 		<band splitType="Stretch"/>
 	</columnHeader>
 	<detail>
-		<band height="369" splitType="Stretch">
+		<band height="513" splitType="Stretch">
 			<componentElement>
-				<reportElement positionType="Float" x="0" y="160" width="555" height="90" uuid="bbc13ce6-c3ee-44fc-baff-54d0273e8f54">
+				<reportElement positionType="Float" x="0" y="157" width="555" height="90" uuid="bbc13ce6-c3ee-44fc-baff-54d0273e8f54">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 1_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 1_CH"/>
@@ -370,7 +445,7 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 				</jr:table>
 			</componentElement>
 			<componentElement>
-				<reportElement positionType="Float" x="0" y="280" width="555" height="88" uuid="5d9644db-5dbe-454e-9579-dcb4f9e4447a">
+				<reportElement positionType="Float" x="0" y="380" width="555" height="88" uuid="5d9644db-5dbe-454e-9579-dcb4f9e4447a">
 					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
 					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 2_TH"/>
 					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 2_CH"/>
@@ -391,7 +466,7 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 						<jr:columnHeader style="Table 2_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="555" height="30" uuid="17c1722e-386d-4b3a-80fb-94ea6ab406bf"/>
-								<textElement textAlignment="Center">
+								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="12" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Approuvé par]]></text>
@@ -536,6 +611,103 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 				</textElement>
 				<text><![CDATA[Fichiers :]]></text>
 			</staticText>
+			<componentElement>
+				<reportElement positionType="Float" x="0" y="270" width="554" height="90" uuid="e79d224c-52df-4299-b088-b46f30e62b9c">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table 5_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table 5_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table 5_TD"/>
+					<property name="net.sf.jasperreports.export.headertoolbar.table.name" value="Table commentaire de ligne de code"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Commentaires Lignes de code" uuid="7ee7a037-5a6f-49d7-bed0-807c917d138e">
+						<datasetParameter name="idreport">
+							<datasetParameterExpression><![CDATA[$P{idreport}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="554" uuid="62281eb3-c859-42db-a595-27908f5bd575">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonnes [3]"/>
+						<jr:columnHeader style="Table 5_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="554" height="30" uuid="4ba48545-78cf-4475-ad6b-bbd447277100"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="12" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Commentaires du code]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="150" uuid="d8a3e040-ade3-4044-ab89-06fbef724f69">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonne1"/>
+							<jr:columnHeader style="Table 5_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="150" height="30" uuid="b6f71d6e-b60e-4cf6-8341-3e3b004f089c"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle">
+										<font size="14"/>
+									</textElement>
+									<text><![CDATA[Posté par]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="Table 5_TD" height="30">
+								<textField>
+									<reportElement x="0" y="0" width="150" height="30" uuid="7507cbea-3241-4c69-a398-ffdcdf33f7a8"/>
+									<textElement>
+										<font size="12"/>
+										<paragraph leftIndent="5" rightIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nomAuteurCommentaire}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="130" uuid="ac91c238-5376-47a0-921c-b2d599e53ae3">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonne2"/>
+							<jr:columnHeader style="Table 5_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="130" height="30" uuid="cb0c53df-aefa-4d1a-bfe0-ff4e3d4ed0c0"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle">
+										<font size="14"/>
+									</textElement>
+									<text><![CDATA[Posté le]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="Table 5_TD" height="30">
+								<textField pattern="MM/dd/yyyy HH:mm">
+									<reportElement x="0" y="0" width="130" height="30" uuid="8a4eeebf-b990-42a4-887a-7e12b32b662b"/>
+									<textElement>
+										<font size="12"/>
+										<paragraph leftIndent="5" rightIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{valeur_date}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="274" uuid="0dc5cff0-7390-4ae2-85e3-26814a5721a7">
+							<property name="com.jaspersoft.studio.components.table.model.column.name" value="Colonne3"/>
+							<jr:columnHeader style="Table 5_CH" height="30" rowSpan="1">
+								<staticText>
+									<reportElement x="0" y="0" width="274" height="30" uuid="c6ea6d77-26e1-453f-94ce-6d182879d3a7"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle">
+										<font size="14"/>
+									</textElement>
+									<text><![CDATA[Commentaire du code]]></text>
+								</staticText>
+							</jr:columnHeader>
+							<jr:detailCell style="Table 5_TD" height="30">
+								<textField isStretchWithOverflow="true">
+									<reportElement x="0" y="0" width="274" height="30" uuid="bb76f7e8-78d1-4a7b-bba2-dfa7922a531e"/>
+									<textElement>
+										<font size="12"/>
+										<paragraph leftIndent="5" rightIndent="5"/>
+									</textElement>
+									<textFieldExpression><![CDATA["Fichier : " + $F{filename}+ "\n" + "Ligne : " +$F{lineNUmber}+ "\n"+ $F{commentaireLigne}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+				</jr:table>
+			</componentElement>
 		</band>
 	</detail>
 	<columnFooter>

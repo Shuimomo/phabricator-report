@@ -325,10 +325,6 @@ and phabricator_user.user.phid =   phabricator_differential.differential_revisio
 					</textField>
 				</frame>
 			</frame>
-			<textField>
-				<reportElement x="52" y="20" width="100" height="30" uuid="7548fe47-9ba7-458e-b6ff-42de60f65612"/>
-				<textFieldExpression><![CDATA[$P{projet}]]></textFieldExpression>
-			</textField>
 		</band>
 	</title>
 	<pageHeader>
